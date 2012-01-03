@@ -1,0 +1,73 @@
+<?php
+/**
+ * Implements hook_perm
+ */
+function nodehierarchy_downloads_perm() {
+  return array('view downloads');
+}
+
+/**
+ * Implements of hook_views_api().
+ * @return array with Views API version.
+ */
+function nodehierarchy_downloads_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'nodehierarchy_downloads'),
+    //'path' => drupal_get_path('module', 'nodehierarchy_downloads') . '/includes',
+  );
+}
+
+/**
+ * Implements hook_menu()
+ *
+ * @return array
+ */
+function nodehierarchy_downloads_menu() {
+	$items['node/%nodehierarchy_downloads_project/downloads'] = array(
+		'title' => 'Downloads',
+		'type' => MENU_LOCAL_TASK,
+		'page callback' => 'downloads_tab_call_back',
+		'page arguments' => array(1),
+		'access arguments' => array('view downloads'),
+		'weight' => 40,
+	);
+
+	return $items;
+}
+
+/**
+ * Loads additional infos if node type is organic group
+ *
+ * @see nodehierarchy_downloads_menu
+ * @param int nid
+ * @return array
+ */
+function nodehierarchy_downloads_project_load($nid) {
+	if (is_numeric($nid) && $node = node_load($nid)) {
+		if (isset($node->og_description)) {
+			return $node;
+		}
+	}
+
+	return FALSE;
+}
+
+/**
+ * Page callback function for downloads tab menu item
+ *
+ * Shows downloads for parent and children
+ *
+ * @param array node
+ * @return string
+ */
+function downloads_tab_call_back($node) {
+	if(module_exists('nodehierarchy')) {
+		$children = nodehierarchy_get_children($node->nid);
+		$arguments = $node->nid . ($children ? ',' . implode(',', $children) : '');
+	} else {
+		$arguments = $node->nid;
+	}
+
+	return (string)views_embed_view('nodehierarchy_downloads', 'block_1', $arguments);
+}

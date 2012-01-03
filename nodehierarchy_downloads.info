@@ -1,0 +1,9 @@
+; $Id$
+name = Node Hierarchy Downloads
+description = Adds a view and menu item for aggregated downloads (content type download and attachments) for the given node and its children.
+dependencies[] = nodehierarchy
+dependencies[] = views
+dependencies[] = views_or
+; needs a content type project
+core = 6.x
+package = Balance Meta
